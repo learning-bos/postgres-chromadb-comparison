@@ -61,3 +61,4 @@ CREATE TABLE items (id bigserial PRIMARY KEY, content TEXT, embedding vector(384
 - [ ] Perchè non si vedono i vettori una volta  runnato lo script?
 
 ## TEST PGVECTOR CON PG17
+## PROVARE A DOCKERIZZARE L'APP PER FAR PRATICA CON IL DOOCKERFILE
