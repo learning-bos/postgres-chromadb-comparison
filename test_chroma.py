@@ -1,4 +1,5 @@
 import chromadb
+import time
 
 # Create a persistent client
 persistent_client = chromadb.PersistentClient(path="./chroma_db")
@@ -9,24 +10,30 @@ collection = persistent_client.create_collection("qa_collection")
 # Add some question-answer pairs
 collection.add(
     documents=[
-        "The capital of France is Paris.",
-        "The largest planet in our solar system is Jupiter.",
-        "The chemical symbol for gold is Au.",
+        "A group of vibrant parrots chatter loudly, sharing stories of their tropical adventures.",
+        "The mathematician found solace in numbers, deciphering the hidden patterns of the universe.",
+        "The robot, with its intricate circuitry and precise movements, assembles the devices swiftly.",
+        "The chef, with a sprinkle of spices and a dash of love, creates culinary masterpieces.",
+        "The ancient tree, with its gnarled branches and deep roots, whispers secrets of the past.",
+        "The detective, with keen observation and logical reasoning, unravels the intricate web of clues.",
+        "The sunset paints the sky with shades of orange, pink, and purple, reflecting on the calm sea.",
+        "In the dense forest, the howl of a lone wolf echoes, blending with the symphony of the night.",
+        "The dancer, with graceful moves and expressive gestures, tells a story without uttering a word.",
+        "In the quantum realm, particles flicker in and out of existence, dancing to the tunes of probability.",
     ],
-    metadatas=[
-        {"type": "geography"},
-        {"type": "astronomy"},
-        {"type": "chemistry"},
-    ],
-    ids=["1", "2", "3"]
+    ids=["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
 )
 
 # Query the collection with a similar question
-query = "What's the biggest planet?"
+query = "Give me some content about the ocean"
+time_start = time.time()
 results = collection.query(
     query_texts=[query],
     n_results=1
 )
+time_end = time.time()
+
+print(f"Time taken: {time_end - time_start} seconds\n")
 
 # Print the results
 print(f"Query: {query}")

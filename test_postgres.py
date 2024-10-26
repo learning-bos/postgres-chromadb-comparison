@@ -1,93 +1,71 @@
 import psycopg2
-from psycopg2.extras import execute_values
-from sentence_transformers import SentenceTransformer
-import numpy as np
+from embedding_util import generate_embeddings
+import time
 
-# Load the SentenceTransformer model
-model = SentenceTransformer('all-MiniLM-L6-v2')
-'''
+def run():
 
-# Connect to your PostgreSQL database
-conn = psycopg2.connect(
-    host="localhost",
-    database="vector_db",
-    user="postgres",
-    password="postgres"
-)
-# Create a cursor
-cur = conn.cursor()
-# Enable pgvector extension if not already enabled
-cur.execute("CREATE EXTENSION IF NOT EXISTS vector")
-# Create the table with a vector column (if it doesn't exist)
-cur.execute("""
-    CREATE TABLE IF NOT EXISTS embeddings (
-        id SERIAL PRIMARY KEY,
-        text TEXT,
-        embedding vector(384)
+    # Establish a connection to the PostgreSQL database
+    conn = psycopg2.connect(
+        user="postgres",
+        password="postgres",
+        host="localhost",
+        port=5432,  # The port you exposed in docker-compose.yml
+        database="vector_db"
     )
-""")
 
-# Sample texts to embed
-texts = [
-    "The capital of France is Paris.",
-    "The largest planet in our solar system is Jupiter.",
-    "The chemical symbol for gold is Au.",
-]
+    # Create a cursor to execute SQL commands
+    cur = conn.cursor()
 
-# Create embeddings
-embeddings = model.encode(texts)
+    try:
+        sentences = [
+            "A group of vibrant parrots chatter loudly, sharing stories of their tropical adventures.",
+            "The mathematician found solace in numbers, deciphering the hidden patterns of the universe.",
+            "The robot, with its intricate circuitry and precise movements, assembles the devices swiftly.",
+            "The chef, with a sprinkle of spices and a dash of love, creates culinary masterpieces.",
+            "The ancient tree, with its gnarled branches and deep roots, whispers secrets of the past.",
+            "The detective, with keen observation and logical reasoning, unravels the intricate web of clues.",
+            "The sunset paints the sky with shades of orange, pink, and purple, reflecting on the calm sea.",
+            "In the dense forest, the howl of a lone wolf echoes, blending with the symphony of the night.",
+            "The dancer, with graceful moves and expressive gestures, tells a story without uttering a word.",
+            "In the quantum realm, particles flicker in and out of existence, dancing to the tunes of probability.",
+        ]
+        a = 0
+        # Insert sentences into the items table
+        for sentence in sentences:
+            embedding = generate_embeddings(sentence)
+            cur.execute(
+                "INSERT INTO items (content, embedding) VALUES (%s, %s)",
+                (sentence, embedding)
+            )
 
-# Prepare data for insertion
-data = [(text, embedding.tolist()) for text, embedding in zip(texts, embeddings)]
+        # Example query
+        query = "Give me some content about the ocean"
+        time_start = time.time()
+        query_embedding = generate_embeddings(query)
 
-# Insert data into the table
-execute_values(cur, """
-    INSERT INTO embeddings (text, embedding)
-    VALUES %s
-""", data, template="(%s, %s::vector)")
+        # Perform a cosine similarity search
+        cur.execute(
+            """SELECT id, content, 1 - (embedding <=> %s) AS cosine_similarity
+               FROM items
+               ORDER BY cosine_similarity DESC LIMIT 1""",
+            (query_embedding,)
+        )
+        time_end = time.time()
+        print(f"Time taken: {time_end - time_start} seconds\n")
+        # Fetch and print the result
+        print("Query:", query)
+        print("Most similar sentences:")
+        for row in cur.fetchall():
+            print(
+                f"ID: {row[0]}, CONTENT: {row[1]}, Cosine Similarity: {row[2]}")
 
-# Commit the transaction
-conn.commit()
+    except Exception as e:
+        print("Error executing query", str(e))
+    finally:
+        # Close communication with the PostgreSQL database server
+        cur.close()
+        conn.close()
 
-# Close the cursor and connection
-cur.close()
-conn.close()
-'''
-print("Embeddings stored successfully!")
-
-# Query the collection with a similar question
-query = "What's the biggest planet?"
-# Create a new connection and cursor for querying
-conn = psycopg2.connect(
-    host="localhost",
-    database="vector_db",
-    user="postgres",
-    password="postgres"
-)
-cur = conn.cursor()
-
-# Encode the query
-query_embedding = model.encode([query])[0]
-cur.execute("CREATE EXTENSION IF NOT EXISTS vector")
-# Perform the similarity search
-cur.execute("""
-    SELECT text, 1 - (embedding <=> %s) AS cosine_similarity
-    FROM embeddings
-    ORDER BY embedding <=> %s
-    LIMIT 1
-""", (query_embedding.tolist(), query_embedding.tolist()))
-
-# Fetch the result
-result = cur.fetchone()
-
-if result:
-    most_similar_text, similarity = result
-    print(f"Query: {query}")
-    print(f"Most similar document: {most_similar_text}")
-    print(f"Cosine similarity: {similarity}")
-else:
-    print("No results found.")
-
-# Close the cursor and connection
-cur.close()
-conn.close()
+# This check ensures that the function is only run when the script is executed directly, not when it's imported as a module.
+if __name__ == "__main__":
+    run()
