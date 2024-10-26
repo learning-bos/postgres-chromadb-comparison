@@ -23,11 +23,7 @@ docker run --name test-vector-db -e POSTGRES_PASSWORD=postgres -p 5432:5432 post
 
 (you can also place the vm in a separated network)
 
-<div style="background-color: yellow"> <b><u>
-    N.B. : the 17 version of postgresql doesnt support the vector extension. In order to use it you need to downgrade to PG 16 at least 
-</u></b></div>
-
-## Create env
+**_NOTA: the 17 version of postgresql doesnt support the vector extension. In order to use it you need to downgrade to PG 16 at least_**
 
 In order to create a conda environment run:
 conda create -n vecdb-test
@@ -61,4 +57,5 @@ CREATE TABLE items (id bigserial PRIMARY KEY, content TEXT, embedding vector(384
 - [ ] Perchè non si vedono i vettori una volta  runnato lo script?
 
 ## TEST PGVECTOR CON PG17
+
 ## PROVARE A DOCKERIZZARE L'APP PER FAR PRATICA CON IL DOOCKERFILE
