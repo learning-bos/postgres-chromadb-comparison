@@ -47,7 +47,7 @@ def run():
         cur.execute(
             """SELECT id, content, 1 - (embedding <=> %s) AS cosine_similarity
                FROM items
-               ORDER BY cosine_similarity DESC LIMIT 1""",
+               ORDER BY cosine_similarity DESC LIMIT 3""",
             (query_embedding,)
         )
         time_end = time.time()
@@ -57,11 +57,13 @@ def run():
         print("Most similar sentences:")
         for row in cur.fetchall():
             print(
-                f"ID: {row[0]}, CONTENT: {row[1]}, Cosine Similarity: {row[2]}")
+                f"ID: {row[0]}\nCONTENT: {row[1]}\nCosine Similarity: {row[2]}\n")
 
     except Exception as e:
         print("Error executing query", str(e))
     finally:
+        # uncomment this to commit the execute
+        # conn.commit()
         # Close communication with the PostgreSQL database server
         cur.close()
         conn.close()

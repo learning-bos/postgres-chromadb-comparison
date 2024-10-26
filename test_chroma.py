@@ -29,7 +29,7 @@ query = "Give me some content about the ocean"
 time_start = time.time()
 results = collection.query(
     query_texts=[query],
-    n_results=1
+    n_results=3
 )
 time_end = time.time()
 
@@ -37,8 +37,12 @@ print(f"Time taken: {time_end - time_start} seconds\n")
 
 # Print the results
 print(f"Query: {query}")
-print(f"Most similar document: {results['documents'][0][0]}")
-print(f"Distance: {results['distances'][0][0]}")
+
+for index, x in enumerate(results['documents'][0]):
+    print(f"Most similar document: {x}\n")
+    print(f"Distance: {results['distances'][0][index]}\n")
+    print("==============================================\n")
+
 
 # Clean up (optional)
 persistent_client.delete_collection("qa_collection")
