@@ -52,3 +52,12 @@ In order to transform your db the following steps are required:
 1. go inside exec and run apt update
 2. install pgvector with the following command: apt install postgresql-16-pgvector (change the version accordingly)
 3. run through sql: CREATE EXTENSION vector;
+
+Table create like this:
+CREATE TABLE items (id bigserial PRIMARY KEY, content TEXT, embedding vector(384));
+
+## DA RISOLVERE
+
+- [ ] Perchè non si vedono i vettori una volta  runnato lo script?
+
+## TEST PGVECTOR CON PG17
