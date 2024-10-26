@@ -1,0 +1,5 @@
+chromadb
+psycopg2
+numpy
+sentence-transformers
+
