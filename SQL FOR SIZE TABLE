@@ -1,0 +1,2 @@
+# check inside scheme in pgadmin4 for selecting the correct database
+SELECT pg_size_pretty(pg_total_relation_size('public.text_embeddings')); 
