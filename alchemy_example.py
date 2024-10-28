@@ -56,11 +56,15 @@ def insert_all_embeddings():
 
 def find_similar_embeddings(query, limit=1):
     query_embedding = generate_embeddings(query)
+    # a similarity threshold can be setted
+    # similarity_threshold = 0.7
     result = session.query(TextEmbedding, 
                            TextEmbedding.
                            embedding.
                            cosine_distance(query_embedding).
                            label("distance")).order_by("distance").limit(limit).all()
+    
+    '''insert the following after "label("distance"))".filter(TextEmbedding.embedding.cosine_distance(query_embedding) < similarity_threshold)'''
     if len(result) == 0:
         return None
     else:
