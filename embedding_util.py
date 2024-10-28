@@ -29,4 +29,4 @@ def generate_embeddings(text, metadata={}):
 
     embeddings = F.normalize(embeddings, p=2, dim=1)
 
-    return json.dumps(embeddings.numpy().tolist()[0])
+    return embeddings.numpy().tolist()[0]
