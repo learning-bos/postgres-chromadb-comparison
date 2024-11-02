@@ -52,10 +52,10 @@ In order to transform your db the following steps are required:
 Table create like this:
 CREATE TABLE items (id bigserial PRIMARY KEY, content TEXT, embedding vector(384));
 
-## DA RISOLVERE
+## FUTURE
 
-- [ ] Perchè non si vedono i vettori una volta  runnato lo script?
+- [x] Why I cannot see changes in the pgvec? It was because you need to commit after executing the query
 
-## TEST PGVECTOR CON PG17 - funziona con il metodo descritto sopra
+## TEST PGVECTOR WITH PG17 - works with the same steps as described above. The problem was with the windows installation, it doesn't happen in debian
 
-## PROVARE A DOCKERIZZARE L'APP PER FAR PRATICA CON IL DOCKERFILE
+## Try to dockerize the application to get acquainted to the process of creating the image for a deployment
